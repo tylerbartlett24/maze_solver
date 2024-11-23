@@ -1,4 +1,5 @@
 from tkinter import Tk, BOTH, Canvas
+import time
 
 class Window:
     def __init__(self, width, height):
@@ -40,33 +41,3 @@ class Line:
             self.start.x, self.start.y, self.end.x, self.end.y, fill=fill_color, width=2
         )
         
-class Cell:
-    def __init__(self, x1, x2, y1, y2, win, right=True, left=True, top=True,
-                 bottom=True):
-        self.right = right
-        self.left = left
-        self.top = top
-        self.bottom = bottom
-        self._x1 = x1
-        self._x2 = x2
-        self._y1 = y1
-        self._y2 = y2
-        self._win = win
-        
-    def draw(self):
-        if self.top:
-            self._win.draw_line(Line(Point(self._x1, self._y2),
-                                     Point(self._x2, self._y2)),
-                                "black")
-        if self.right:
-            self._win.draw_line(Line(Point(self._x2, self._y2),
-                                     Point(self._x2, self._y1)),
-                                "black")
-        if self.bottom:
-            self._win.draw_line(Line(Point(self._x1, self._y1),
-                                     Point(self._x2, self._y1)),
-                                "black")
-        if self.left:
-            self._win.draw_line(Line(Point(self._x1, self._y1),
-                                     Point(self._x1, self._y2)),
-                                "black")    
