@@ -1,7 +1,7 @@
 from graphics import Line, Point
 
 class Cell:
-    def __init__(self, x1, x2, y1, y2, win, right=True, left=True, top=True,
+    def __init__(self, x1, x2, y1, y2, win=None, right=True, left=True, top=True,
                  bottom=True):
         self.right = right
         self.left = left
@@ -12,24 +12,43 @@ class Cell:
         self._y1 = y1
         self._y2 = y2
         self._win = win
+        self.visited = False
         
     def draw(self):
+        if self._win is None:
+            return
         if self.top:
-            self._win.draw_line(Line(Point(self._x1, self._y2),
-                                     Point(self._x2, self._y2)),
+            self._win.draw_line(Line(Point(self._x1, self._y1),
+                                     Point(self._x2, self._y1)),
                                 "black")
+        else:
+            self._win.draw_line(Line(Point(self._x1, self._y1),
+                                     Point(self._x2, self._y1)),
+                                "white")
         if self.right:
             self._win.draw_line(Line(Point(self._x2, self._y2),
                                      Point(self._x2, self._y1)),
                                 "black")
-        if self.bottom:
-            self._win.draw_line(Line(Point(self._x1, self._y1),
+        else:
+            self._win.draw_line(Line(Point(self._x2, self._y2),
                                      Point(self._x2, self._y1)),
+                                "white")
+        if self.bottom:
+            self._win.draw_line(Line(Point(self._x1, self._y2),
+                                     Point(self._x2, self._y2)),
                                 "black")
+        else:
+            self._win.draw_line(Line(Point(self._x1, self._y2),
+                                     Point(self._x2, self._y2)),
+                                "white")
         if self.left:
             self._win.draw_line(Line(Point(self._x1, self._y1),
                                      Point(self._x1, self._y2)),
                                 "black")
+        else:
+            self._win.draw_line(Line(Point(self._x1, self._y1),
+                                     Point(self._x1, self._y2)),
+                                "white")
             
     def draw_move(self, to_cell, undo=False):
         from_centre = Point((self._x1 + self._x2)/2, (self._y1 + self._y2)/2)
