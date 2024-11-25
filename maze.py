@@ -58,7 +58,7 @@ class Maze:
         if self._win is None:
             return
         self._win.redraw()
-        time.sleep(0.01)
+        time.sleep(0.02)
         
     def _break_entrance_and_exit(self):
         self.maze[0][0].top = False
@@ -67,22 +67,97 @@ class Maze:
         self.maze[-1][-1].draw()
         
         
-    def whatever(self):
-        random.seed()
-        entrance_hole = random.randint(0, 1)
-        exit_hole = random.randint(2, 3)
-        match entrance_hole:
+    def break_walls_r(self, i, j):
+        self.maze[i][j].visited = True
+        while True:
+            to_visit = []
+            if i - 1 > 0:
+                if self.maze[i - 1][j].visited == False:
+                    to_visit.append("left")
+            if i + 1 < self.num_cols:
+                if self.maze[i + 1][j].visited == False:
+                    to_visit.append("right")
+            if j - 1 > 0:
+                if self.maze[i][j - 1].visited == False:
+                    to_visit.append("top")
+            if j + 1 < self.num_rows:
+                if self.maze[i][j + 1].visited == False:
+                    to_visit.append("bottom")
+            if len(to_visit) == 0:
+                self.maze[i][j].draw()
+                return
+            direction = to_visit[random.randint(0, len(to_visit) - 1)]
+            match direction:
             
-            case 0:
-                self.maze[0][0].top = False
-            case 1:
-                self.maze[0][0].left = False
-            case 2:
-                self.maze[0][0].bottom = False
-            case 3:
-                self.maze[0][0].right = False
-            case _:
-                raise Exception("Trying to delete non-existent wall.")
+                case "left":
+                    self.maze[i - 1][j].right = False
+                    self.maze[i][j].left = False
+                    self.maze[i - 1][j].draw()
+                    self.maze[i][j].draw()
+                    self.break_walls_r(i - 1, j)
+                case "right":
+                    self.maze[i + 1][j].left = False
+                    self.maze[i][j].right = False
+                    self.maze[i + 1][j].draw()
+                    self.maze[i][j].draw()
+                    self.break_walls_r(i + 1, j)
+                case "top":
+                    self.maze[i][j - 1].bottom = False
+                    self.maze[i][j].top = False
+                    self.maze[i][j - 1].draw()
+                    self.maze[i][j].draw()
+                    self.break_walls_r(i, j - 1)
+                case "bottom":
+                    self.maze[i][j + 1].top = False
+                    self.maze[i][j].bottom = False
+                    self.maze[i][j + 1].draw()
+                    self.maze[i][j].draw()
+                    self.break_walls_r(i, j + 1)
+                case _:
+                    raise Exception("Trying to go in an illegal direction.")
+                
+    def _reset_visited(self):
+        for i in self.maze:
+            for j in i:
+                j.visited = False
+                
+    def solve(self):
+        self.solve_r(0, 0)
         
-        
-        
+    def solve_r(self, i, j):
+        self._animate()
+        self.maze[i][j].visited = True
+        if self.maze[i][j] == self.maze[-1][-1]:
+            return True
+        directions = ["left", "right", "bottom", "top"]
+        for direction in directions:
+            if direction == "left" and not self.maze[i][j].left:
+                if not self.maze[i-1][j].visited:
+                    self.maze[i][j].draw_move(self.maze[i-1][j])
+                    if self.solve_r(i-1, j):
+                        return True
+                    else:
+                        self.maze[i-1][j].draw_move(self.maze[i][j],undo=True)
+            elif direction == "right" and not self.maze[i][j].right:
+                if not self.maze[i+1][j].visited:
+                    self.maze[i][j].draw_move(self.maze[i+1][j])
+                    if self.solve_r(i+1, j):
+                        return True
+                    else:
+                        self.maze[i+1][j].draw_move(self.maze[i][j],undo=True)
+            elif direction == "top" and not self.maze[i][j].top:
+                if not self.maze[i][j-1].visited:
+                    self.maze[i][j].draw_move(self.maze[i][j-1])
+                    if self.solve_r(i, j-1):
+                        return True
+                    else:
+                        self.maze[i][j-1].draw_move(self.maze[i][j], undo=True)
+            elif direction == "bottom" and not self.maze[i][j].bottom:
+                if not self.maze[i][j+1].visited:
+                    self.maze[i][j].draw_move(self.maze[i][j+1])
+                    if self.solve_r(i, j+1):
+                        return True
+                    else:
+                        self.maze[i][j+1].draw_move(self.maze[i][j], undo=True)
+        return False
+                    

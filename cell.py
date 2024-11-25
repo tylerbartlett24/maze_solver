@@ -1,4 +1,5 @@
 from graphics import Line, Point
+import time
 
 class Cell:
     def __init__(self, x1, x2, y1, y2, win=None, right=True, left=True, top=True,
